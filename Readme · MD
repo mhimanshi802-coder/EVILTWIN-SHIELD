@@ -1,0 +1,185 @@
+# 🛡️ EvilTwin Shield — Full-Stack Cybersecurity System
+
+> **For educational and cybersecurity awareness purposes only.**  
+> No real-world attacks or unauthorized network access are implemented.
+
+---
+
+## 📁 Project Structure
+
+```
+eviltwin-shield/
+├── frontend/
+│   └── index.html          ← Complete SPA frontend
+├── backend/
+│   ├── server.js           ← Express + Socket.io entry point
+│   ├── .env                ← Environment variables
+│   ├── package.json
+│   ├── config/
+│   │   └── database.js     ← MongoDB connection
+│   ├── models/
+│   │   ├── User.js         ← User schema (JWT auth)
+│   │   ├── Network.js      ← Scanned network schema
+│   │   ├── Report.js       ← User report schema
+│   │   └── ThreatLog.js    ← Threat event log schema
+│   ├── controllers/
+│   │   ├── authController.js   ← Register / Login / Me
+│   │   ├── scanController.js   ← WiFi scan + simulation
+│   │   ├── reportController.js ← Submit / get reports
+│   │   └── logController.js    ← Threat logs + analytics
+│   ├── routes/
+│   │   └── index.js        ← All API routes
+│   ├── middleware/
+│   │   └── auth.js         ← JWT protect + authorize
+│   └── services/
+│       ├── wifiScanner.js  ← Core scan engine + risk scoring
+│       └── memoryStore.js  ← In-memory DB (fallback)
+└── README.md
+```
+
+---
+
+## 🚀 Quick Start (5 Minutes)
+
+### Prerequisites
+- Node.js v18+ — https://nodejs.org
+- MongoDB (optional — system works without it using memory store)
+
+### Step 1: Install Dependencies
+```bash
+cd eviltwin-shield/backend
+npm install
+```
+
+### Step 2: Configure Environment
+Edit `backend/.env` if needed (defaults work out of the box):
+```env
+PORT=3001
+MONGO_URI=mongodb://localhost:27017/eviltwin_shield
+JWT_SECRET=eviltwin_shield_super_secret_jwt_key_2024
+JWT_EXPIRE=7d
+FRONTEND_URL=http://localhost:3000
+```
+
+### Step 3: Start Backend
+```bash
+# Development (auto-restart on changes)
+npm run dev
+
+# Production
+npm start
+```
+
+You'll see:
+```
+╔════════════════════════════════════════╗
+║   EvilTwin Shield API — Port 3001      ║
+╚════════════════════════════════════════╝
+🚀 API:       http://localhost:3001/api
+🌐 Frontend:  http://localhost:3001
+📡 Socket.io: ws://localhost:3001
+🔑 Admin:     admin@eviltwin.local / admin123
+```
+
+### Step 4: Open Frontend
+Visit **http://localhost:3001** — the backend serves the frontend automatically.
+
+Or open `frontend/index.html` directly in your browser.
+
+---
+
+## 🔑 Demo Credentials
+
+| Role  | Email                    | Password  |
+|-------|--------------------------|-----------|
+| Admin | admin@eviltwin.local     | admin123  |
+| User  | analyst@eviltwin.local   | admin123  |
+
+---
+
+## 📡 API Reference
+
+### Auth
+| Method | Endpoint           | Auth     | Description          |
+|--------|--------------------|----------|----------------------|
+| POST   | /api/auth/register | Public   | Create account       |
+| POST   | /api/auth/login    | Public   | Login, get JWT token |
+| GET    | /api/auth/me       | Required | Get current user     |
+
+### Scanning
+| Method | Endpoint             | Auth     | Description              |
+|--------|----------------------|----------|--------------------------|
+| GET    | /api/scan            | Optional | Perform WiFi scan        |
+| POST   | /api/scan/simulate   | Optional | Run attack simulation    |
+| GET    | /api/scan/history    | Required | Scan history             |
+
+### Reports
+| Method | Endpoint               | Auth     | Description        |
+|--------|------------------------|----------|--------------------|
+| POST   | /api/reports           | Optional | Submit report      |
+| GET    | /api/reports           | Required | List all reports   |
+| PATCH  | /api/reports/:id/status| Admin    | Update status      |
+
+### Logs
+| Method | Endpoint               | Auth     | Description        |
+|--------|------------------------|----------|--------------------|
+| GET    | /api/logs              | Required | All threat logs    |
+| GET    | /api/logs/analytics    | Required | Dashboard analytics|
+| PATCH  | /api/logs/:id/status   | Admin    | Update log status  |
+
+---
+
+## 🧠 Risk Scoring Algorithm
+
+Each scanned network is scored 0–100:
+
+| Condition                          | Points |
+|------------------------------------|--------|
+| Duplicate SSID (different BSSID)   | +40    |
+| Open / no encryption               | +20    |
+| WEP encryption (broken since 2001) | +15    |
+| Signal > -45 dBm (boosted rogue)   | +15    |
+| Unknown/rogue vendor               | +25    |
+| Known SSID + weak encryption       | +15    |
+| Rogue OUI prefix in BSSID          | +10    |
+
+**Risk Levels:** LOW (0–34) · MEDIUM (35–59) · HIGH (60–79) · CRITICAL (80–100)
+
+---
+
+## 📡 Socket.io Events
+
+| Event         | Direction       | Payload                                      |
+|---------------|-----------------|----------------------------------------------|
+| `connected`   | Server→Client   | Welcome message + clientId                   |
+| `scan-update` | Server→Client   | stats, scanId, timestamp                     |
+| `new-threat`  | Server→Client   | ssid, bssid, riskLevel, riskScore, reasons   |
+| `alert`       | Server→Client   | event, message, severity, timestamp          |
+| `request-scan`| Client→Server   | { simulation: bool } — trigger scan via WS   |
+
+Background scans emit events every **45 seconds** to all connected clients.
+
+---
+
+## 🔐 Security Features
+
+- **JWT Authentication** — 7-day expiry, role-based (user/admin)
+- **bcrypt** — Password hashing with salt rounds = 12
+- **Rate Limiting** — 200 requests / 15 minutes per IP
+- **Input Validation** — Length limits, enum validation, sanitization
+- **CORS** — Configurable origin restrictions
+- **Role Guards** — Admin routes protected with `authorize('admin')` middleware
+
+---
+
+## ⚠️ Ethical Notice
+
+This system is built **strictly for educational and cybersecurity awareness**:
+- All network scanning is **100% simulated** — no real Wi-Fi hardware access
+- No deauthentication packets are ever sent
+- No unauthorized network interaction of any kind
+- For security research, penetration testing requires explicit authorization
+
+---
+
+*EvilTwin Shield v1.0 — Built for cybersecurity education*

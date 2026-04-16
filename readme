@@ -1,0 +1,202 @@
+# 🛡️ EvilTwin Shield — Attack Detection & Awareness System
+
+> **Educational cybersecurity tool** for simulating detection of Evil Twin (rogue Wi-Fi) attacks.  
+> ⚠️ This project is strictly for educational and cybersecurity awareness purposes.
+
+---
+
+## 📸 Features
+
+| Module | Description |
+|--------|-------------|
+| **Dashboard** | Live overview, threat stats, detection trend chart, attack vector radar |
+| **Network Scanner** | 18 simulated Wi-Fi networks with risk scoring, signal meters, duplicate SSID detection |
+| **Attack Awareness** | Evil Twin explained with flow diagram, 5-step walkthrough, IoC table |
+| **Prevention & Safety** | 9 best-practice cards + interactive safety checklist |
+| **Report Network** | Submit suspicious network reports with live community feed |
+| **Admin Panel** | Threat logs, Networks DB, Feedback table, 3 analytics charts |
+
+---
+
+## 🗂️ Folder Structure
+
+```
+evil-twin-detector/
+├── index.html              ← Complete standalone frontend (React-like SPA)
+├── README.md
+├── backend/
+│   ├── server.js           ← Node.js + Express REST API + WebSocket
+│   └── package.json
+└── sample-data/
+    └── networks.json       ← Sample Wi-Fi dataset (18 networks)
+```
+
+---
+
+## 🚀 Quick Start
+
+### Option A — Frontend Only (No Setup Required)
+Just open `index.html` in any modern browser. All data is simulated in-browser.
+
+---
+
+### Option B — Full Stack (Frontend + Backend + MongoDB)
+
+#### Prerequisites
+- Node.js v18+
+- MongoDB (local or MongoDB Atlas)
+
+#### 1. Start the Backend
+
+```bash
+cd backend
+npm install
+# Local MongoDB:
+node server.js
+
+# With MongoDB Atlas:
+MONGO_URI=mongodb+srv://user:pass@cluster.mongodb.net/eviltwin node server.js
+```
+
+Server starts on **http://localhost:3001**
+
+#### 2. Open the Frontend
+
+```bash
+# Simply open index.html in your browser, OR serve it:
+npx serve . -p 3000
+```
+
+Visit **http://localhost:3000**
+
+---
+
+## 📡 REST API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/health` | System health check |
+| `GET` | `/api/networks` | All detected networks |
+| `GET` | `/api/networks?risk=high` | Filter by risk level |
+| `GET` | `/api/networks?dup=true` | Duplicate SSIDs only |
+| `POST` | `/api/networks/scan` | Trigger a new scan |
+| `GET` | `/api/networks/:bssid` | Get network by BSSID |
+| `GET` | `/api/logs` | All threat logs |
+| `PATCH` | `/api/logs/:id/status` | Update log status |
+| `GET` | `/api/feedback` | All user reports |
+| `POST` | `/api/feedback` | Submit new report |
+| `GET` | `/api/analytics/summary` | Dashboard stats |
+| `GET` | `/api/analytics/trends` | 7-day trend data |
+
+---
+
+## 🗄️ Database Collections
+
+### `networks`
+```json
+{
+  "ssid": "Starbucks_WiFi",
+  "bssid": "AA:BB:CC:11:22:33",
+  "signal": -42,
+  "channel": 6,
+  "encryption": "Open",
+  "vendor": "Alfa Networks",
+  "riskScore": 92,
+  "riskLevel": "high",
+  "isDuplicate": true,
+  "isRogue": true,
+  "detectedAt": "2025-04-13T14:23:07Z"
+}
+```
+
+### `threatlogs`
+```json
+{
+  "ssid": "Starbucks_WiFi",
+  "bssid": "AA:BB:CC:11:22:33",
+  "attackType": "evil_twin",
+  "riskScore": 92,
+  "riskLevel": "high",
+  "status": "open",
+  "details": "Duplicate SSID with boosted signal",
+  "createdAt": "2025-04-13T14:23:07Z"
+}
+```
+
+### `feedbacks`
+```json
+{
+  "reportId": "RPT-001",
+  "ssid": "Airport_Free_WiFi",
+  "location": "T3 International Airport",
+  "threatType": "Evil Twin",
+  "riskLevel": "high",
+  "details": "Open network with captive portal requesting passport info",
+  "status": "open",
+  "submittedAt": "2025-04-13T14:00:00Z"
+}
+```
+
+---
+
+## 🧮 Risk Scoring Algorithm
+
+The backend calculates a 0–100 risk score for each detected network:
+
+| Condition | Points |
+|-----------|--------|
+| Duplicate SSID detected | +40 |
+| Open network on known SSID | +25 |
+| Signal strength > -45 dBm | +20 |
+| Open/unauthenticated network | +15 |
+| Unknown vendor | +10 |
+
+**Risk Levels:** Low (0–34) · Medium (35–64) · High (65–100)
+
+---
+
+## 🔌 WebSocket Events
+
+The backend uses Socket.io for real-time alerts:
+
+| Event | Direction | Payload |
+|-------|-----------|---------|
+| `scan_complete` | Server → Client | `{ count, timestamp }` |
+| `new_threat` | Server → Client | `{ ssid, level, source }` |
+| `threat_event` | Server → Client | `{ type, ssid, severity }` |
+
+---
+
+## 🔐 Security Features
+
+- **Input validation** — all API inputs validated with `express-validator`
+- **Rate limiting** — 100 requests / 15 minutes per IP
+- **BSSID format validation** — regex enforcement
+- **String sanitization** — `.escape()` on all user text inputs
+- **Enum validation** — all enum fields strictly validated
+
+---
+
+## ⚠️ Ethical Notice
+
+This system is built **strictly for educational purposes**:
+- All network data is **simulated** — no real Wi-Fi scanning
+- No unauthorized network interaction of any kind
+- Detection logic is for **awareness and learning only**
+- Complies with responsible disclosure practices
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Vanilla JS SPA (React-style), Chart.js, CSS custom properties |
+| Backend | Node.js, Express.js, Socket.io |
+| Database | MongoDB with Mongoose ODM |
+| Security | express-rate-limit, express-validator, CORS |
+| UI Theme | Dark mode, Share Tech Mono + Rajdhani fonts, neon accents |
+
+---
+
+*EvilTwin Shield v2.4.1 — Built for cybersecurity education*
